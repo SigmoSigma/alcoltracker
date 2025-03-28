@@ -63,6 +63,8 @@ const registerForm = document.getElementById('registerForm');
 const expenseForm = document.getElementById('expenseForm');
 const createGroupForm = document.getElementById('createGroupForm');
 const groupsList = document.getElementById('groupsList');
+const menuToggle = document.querySelector('.menu-toggle');
+const navLinks = document.querySelector('.nav-links');
 
 // Elementi DOM per i gruppi
 const joinGroupBtn = document.getElementById('joinGroupBtn');
@@ -940,6 +942,20 @@ function updateGroupCharts(group, groupExpenses) {
             btn.classList.add('active');
             const tabId = btn.getAttribute('data-tab');
             document.getElementById(`${tabId}Leaderboard`).classList.add('active');
+        });
+    });
+}
+
+// Gestione del menu mobile
+if (menuToggle && navLinks) {
+    menuToggle.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
+    });
+
+    // Chiudi il menu quando si clicca su un link
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            navLinks.classList.remove('active');
         });
     });
 }
