@@ -779,4 +779,82 @@ tr:hover {
 
 .hidden {
     display: none !important;
+}
+
+/* Stili per la lista delle spese */
+.expenses-list {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.expenses-table {
+    width: 100%;
+    min-width: 600px; /* Larghezza minima per mantenere la leggibilità */
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.expenses-table th,
+.expenses-table td {
+    padding: 1rem;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.expenses-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #2c3e50;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.expenses-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.expenses-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Media query per dispositivi mobili */
+@media (max-width: 768px) {
+    .expenses-list {
+        margin: 0 -1rem;
+        padding: 0 1rem;
+    }
+
+    .expenses-table {
+        font-size: 0.9rem;
+    }
+
+    .expenses-table th,
+    .expenses-table td {
+        padding: 0.8rem 0.5rem;
+    }
+
+    .expenses-table th:first-child,
+    .expenses-table td:first-child {
+        position: sticky;
+        left: 0;
+        background: #f8f9fa;
+        z-index: 2;
+    }
+
+    .expenses-table th:last-child,
+    .expenses-table td:last-child {
+        position: sticky;
+        right: 0;
+        background: #f8f9fa;
+        z-index: 2;
+    }
+}
+
+/* Ottimizzazioni per iOS */
+@supports (-webkit-touch-callout: none) {
+    .expenses-list {
+        -webkit-overflow-scrolling: touch;
+    }
 } 
