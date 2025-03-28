@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dettagli Gruppo - AlcolTracker</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">AlcolTracker</div>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <a href="expenses.html" class="nav-link">Spese</a>
+            <a href="groups.html" class="nav-link">Gruppi</a>
+            <button id="logoutBtn" class="btn">Esci</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="section">
+            <div class="group-details-header">
+                <div class="header-top">
+                    <h2 id="groupName">Nome del Gruppo</h2>
+                    <div class="period-selector">
+                        <label for="periodSelect">Periodo:</label>
+                        <select id="periodSelect" class="period-select">
+                            <option value="2025">2025</option>
+                            <option value="2025-01">Gennaio 2025</option>
+                            <option value="2025-02">Febbraio 2025</option>
+                            <option value="2025-03">Marzo 2025</option>
+                            <option value="2025-04">Aprile 2025</option>
+                            <option value="2025-05">Maggio 2025</option>
+                            <option value="2025-06">Giugno 2025</option>
+                            <option value="2025-07">Luglio 2025</option>
+                            <option value="2025-08">Agosto 2025</option>
+                            <option value="2025-09">Settembre 2025</option>
+                            <option value="2025-10">Ottobre 2025</option>
+                            <option value="2025-11">Novembre 2025</option>
+                            <option value="2025-12">Dicembre 2025</option>
+                        </select>
+                    </div>
+                </div>
+                <p id="groupDescription" class="group-description"></p>
+                <div class="group-stats">
+                    <div class="stat-card">
+                        <h3>Totale Spese Gruppo</h3>
+                        <p id="totalGroupExpense">€0.00</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Totale Litri Gruppo</h3>
+                        <p id="totalGroupLiters">0.00 L</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="members-stats">
+                <h3>Statistiche per Membro</h3>
+                <div class="members-grid" id="membersStats">
+                    <!-- Le statistiche dei membri verranno inserite qui dinamicamente -->
+                </div>
+            </div>
+
+            <div class="leaderboard">
+                <h3>Classifica per Tipo di Alcol</h3>
+                <div class="leaderboard-tabs">
+                    <button class="tab-btn active" data-tab="beer">Birra</button>
+                    <button class="tab-btn" data-tab="wine">Vino</button>
+                    <button class="tab-btn" data-tab="spirits">Superalcolici</button>
+                    <button class="tab-btn" data-tab="spritz">Spritz</button>
+                </div>
+                <div class="leaderboard-content">
+                    <div id="beerLeaderboard" class="leaderboard-list active">
+                        <!-- Classifica per birra -->
+                    </div>
+                    <div id="wineLeaderboard" class="leaderboard-list">
+                        <!-- Classifica per vino -->
+                    </div>
+                    <div id="spiritsLeaderboard" class="leaderboard-list">
+                        <!-- Classifica per superalcolici -->
+                    </div>
+                    <div id="spritzLeaderboard" class="leaderboard-list">
+                        <!-- Classifica per spritz -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registrato con successo:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Registrazione ServiceWorker fallita:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html> 

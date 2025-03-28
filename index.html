@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlcolTracker - Monitora le tue spese alcoliche</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">AlcolTracker</div>
+    </nav>
+
+    <main class="container">
+        <section id="welcome" class="section">
+            <h1>Benvenuto in AlcolTracker</h1>
+            <p>Monitora le tue spese alcoliche in modo intelligente</p>
+            <div class="welcome-buttons">
+                <button id="welcomeLoginBtn" class="btn">Accedi</button>
+                <button id="welcomeRegisterBtn" class="btn">Registrati</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modali -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h2>Accedi</h2>
+            <form id="loginForm">
+                <input type="text" placeholder="Nome Utente" required>
+                <input type="password" placeholder="Password" required>
+                <button type="submit" class="btn">Accedi</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <h2>Registrati</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="username">Nome Utente</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Conferma Password</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+                <button type="submit" class="btn">Registrati</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registrato con successo:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Registrazione ServiceWorker fallita:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html> 

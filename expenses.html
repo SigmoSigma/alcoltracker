@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spese - AlcolTracker</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">AlcolTracker</div>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <a href="expenses.html" class="nav-link active">Spese</a>
+            <a href="groups.html" class="nav-link">Gruppi</a>
+            <button id="logoutBtn" class="btn">Esci</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="section">
+            <div class="expenses-header">
+                <h2>Le tue Spese</h2>
+                <button id="addExpenseBtn" class="btn">Aggiungi Spesa</button>
+            </div>
+
+            <div class="expenses-list">
+                <h3>Lista Spese</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Tipo</th>
+                            <th>Importo</th>
+                            <th>Quantità</th>
+                            <th>Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expensesList">
+                        <!-- Le spese verranno inserite qui dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modale per aggiungere una spesa -->
+    <div id="expenseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Aggiungi Spesa</h2>
+                <button class="close-btn" onclick="toggleModal(document.getElementById('expenseModal'), false)">&times;</button>
+            </div>
+            <form id="expenseForm">
+                <div class="form-group">
+                    <label for="type">Tipo:</label>
+                    <select id="type" name="type" required>
+                        <option value="">Seleziona un tipo</option>
+                        <option value="beer">Birra</option>
+                        <option value="wine">Vino</option>
+                        <option value="spirits">Superalcolici</option>
+                        <option value="spritz">Spritz</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="quantity">Quantità (L):</label>
+                    <input type="number" id="quantity" name="quantity" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="amount">Importo (€):</label>
+                    <input type="number" id="amount" name="amount" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="date">Data:</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                <button type="submit" class="btn">Aggiungi Spesa</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registrato con successo:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Registrazione ServiceWorker fallita:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html> 
