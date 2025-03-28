@@ -145,7 +145,6 @@ if (elements.registerForm) {
     elements.registerForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const username = document.getElementById('username').value;
-        const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
         
@@ -155,8 +154,8 @@ if (elements.registerForm) {
         }
         
         // Verifica se l'utente esiste già
-        if (registeredUsers.some(u => u.username === username || u.email === email)) {
-            alert('Nome utente o email già in uso!');
+        if (registeredUsers.some(u => u.username === username)) {
+            alert('Nome utente già in uso!');
             return;
         }
         
@@ -164,7 +163,6 @@ if (elements.registerForm) {
         const newUser = {
             id: Date.now(), // Usa timestamp come ID univoco
             username,
-            email,
             password
         };
         
