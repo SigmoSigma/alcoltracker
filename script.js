@@ -6,96 +6,111 @@ let typeChart = null;
 let quantityChart = null;
 
 // Gestione degli utenti registrati
-let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+let registeredUsers = [];
+try {
+    registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+} catch (error) {
+    console.error('Errore nel caricamento degli utenti:', error);
+    registeredUsers = [];
+}
 
 // Funzioni per la persistenza dei dati
 function saveData() {
-    if (currentUser) {
-        localStorage.setItem(`expenses_${currentUser.id}`, JSON.stringify(expenses));
-        // Salva i gruppi globalmente
-        localStorage.setItem('groups', JSON.stringify(groups));
+    try {
+        if (currentUser) {
+            localStorage.setItem(`expenses_${currentUser.id}`, JSON.stringify(expenses));
+            localStorage.setItem('groups', JSON.stringify(groups));
+        }
+    } catch (error) {
+        console.error('Errore nel salvataggio dei dati:', error);
     }
 }
 
 function loadData() {
-    if (currentUser) {
-        const savedExpenses = localStorage.getItem(`expenses_${currentUser.id}`);
-        // Carica i gruppi globalmente
-        const savedGroups = localStorage.getItem('groups');
-        
-        console.log('Caricamento dati per utente:', currentUser.id);
-        console.log('Spese salvate:', savedExpenses);
-        
-        if (savedExpenses) {
-            expenses = JSON.parse(savedExpenses);
-            console.log('Spese caricate:', expenses);
+    try {
+        if (currentUser) {
+            const savedExpenses = localStorage.getItem(`expenses_${currentUser.id}`);
+            const savedGroups = localStorage.getItem('groups');
+            
+            if (savedExpenses) {
+                expenses = JSON.parse(savedExpenses);
+            }
+            if (savedGroups) {
+                groups = JSON.parse(savedGroups);
+            }
         }
-        if (savedGroups) {
-            groups = JSON.parse(savedGroups);
-            console.log('Gruppi caricati:', groups);
-        }
+    } catch (error) {
+        console.error('Errore nel caricamento dei dati:', error);
+        expenses = [];
+        groups = [];
     }
 }
 
 // Carica i gruppi all'avvio dell'applicazione
 function loadGroups() {
-    const savedGroups = localStorage.getItem('groups');
-    if (savedGroups) {
-        groups = JSON.parse(savedGroups);
-        console.log('Gruppi caricati all\'avvio:', groups);
+    try {
+        const savedGroups = localStorage.getItem('groups');
+        if (savedGroups) {
+            groups = JSON.parse(savedGroups);
+        }
+    } catch (error) {
+        console.error('Errore nel caricamento dei gruppi:', error);
+        groups = [];
     }
 }
 
 // Elementi DOM
-const loginBtn = document.getElementById('loginBtn');
-const registerBtn = document.getElementById('registerBtn');
-const logoutBtn = document.getElementById('logoutBtn');
-const welcomeLoginBtn = document.getElementById('welcomeLoginBtn');
-const welcomeRegisterBtn = document.getElementById('welcomeRegisterBtn');
-const loginModal = document.getElementById('loginModal');
-const registerModal = document.getElementById('registerModal');
-const expenseModal = document.getElementById('expenseModal');
-const createGroupModal = document.getElementById('createGroupModal');
-const addExpenseBtn = document.getElementById('addExpenseBtn');
-const createGroupBtn = document.getElementById('createGroupBtn');
-const loginForm = document.getElementById('loginForm');
-const registerForm = document.getElementById('registerForm');
-const expenseForm = document.getElementById('expenseForm');
-const createGroupForm = document.getElementById('createGroupForm');
-const groupsList = document.getElementById('groupsList');
-const menuToggle = document.querySelector('.menu-toggle');
-const navLinks = document.querySelector('.nav-links');
-
-// Elementi DOM per i gruppi
-const joinGroupBtn = document.getElementById('joinGroupBtn');
-const joinGroupModal = document.getElementById('joinGroupModal');
-const joinGroupForm = document.getElementById('joinGroupForm');
+const elements = {
+    loginBtn: document.getElementById('loginBtn'),
+    registerBtn: document.getElementById('registerBtn'),
+    logoutBtn: document.getElementById('logoutBtn'),
+    welcomeLoginBtn: document.getElementById('welcomeLoginBtn'),
+    welcomeRegisterBtn: document.getElementById('welcomeRegisterBtn'),
+    loginModal: document.getElementById('loginModal'),
+    registerModal: document.getElementById('registerModal'),
+    expenseModal: document.getElementById('expenseModal'),
+    createGroupModal: document.getElementById('createGroupModal'),
+    addExpenseBtn: document.getElementById('addExpenseBtn'),
+    createGroupBtn: document.getElementById('createGroupBtn'),
+    loginForm: document.getElementById('loginForm'),
+    registerForm: document.getElementById('registerForm'),
+    expenseForm: document.getElementById('expenseForm'),
+    createGroupForm: document.getElementById('createGroupForm'),
+    groupsList: document.getElementById('groupsList'),
+    menuToggle: document.querySelector('.menu-toggle'),
+    navLinks: document.querySelector('.nav-links'),
+    joinGroupBtn: document.getElementById('joinGroupBtn'),
+    joinGroupModal: document.getElementById('joinGroupModal'),
+    joinGroupForm: document.getElementById('joinGroupForm')
+};
 
 // Funzione per mostrare/nascondere il modale
 function toggleModal(modal, show) {
-    if (show) {
-        modal.classList.add('active');
-    } else {
-        modal.classList.remove('active');
+    if (modal) {
+        if (show) {
+            modal.classList.add('active');
+        } else {
+            modal.classList.remove('active');
+        }
     }
 }
 
 // Gestione Autenticazione
 function showLoginModal() {
-    toggleModal(loginModal, true);
-    toggleModal(registerModal, false);
+    toggleModal(elements.loginModal, true);
+    toggleModal(elements.registerModal, false);
 }
 
 function showRegisterModal() {
-    toggleModal(registerModal, true);
-    toggleModal(loginModal, false);
+    toggleModal(elements.registerModal, true);
+    toggleModal(elements.loginModal, false);
 }
 
 // Event listeners per i pulsanti di login/registrazione
-if (welcomeLoginBtn) welcomeLoginBtn.addEventListener('click', showLoginModal);
-if (welcomeRegisterBtn) welcomeRegisterBtn.addEventListener('click', showRegisterModal);
-if (loginBtn) loginBtn.addEventListener('click', showLoginModal);
-if (registerBtn) registerBtn.addEventListener('click', showRegisterModal);
+if (elements.welcomeLoginBtn) elements.welcomeLoginBtn.addEventListener('click', showLoginModal);
+if (elements.welcomeRegisterBtn) elements.welcomeRegisterBtn.addEventListener('click', showRegisterModal);
+if (elements.loginBtn) elements.loginBtn.addEventListener('click', showLoginModal);
+if (elements.registerBtn) elements.registerBtn.addEventListener('click', showRegisterModal);
 
 // Chiudi modali quando si clicca fuori
 window.addEventListener('click', (e) => {
@@ -105,11 +120,11 @@ window.addEventListener('click', (e) => {
 });
 
 // Gestione form di login
-if (loginForm) {
-    loginForm.addEventListener('submit', (e) => {
+if (elements.loginForm) {
+    elements.loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const username = loginForm.querySelector('input[type="text"]').value;
-        const password = loginForm.querySelector('input[type="password"]').value;
+        const username = elements.loginForm.querySelector('input[type="text"]').value;
+        const password = elements.loginForm.querySelector('input[type="password"]').value;
         
         // Verifica se l'utente esiste e la password è corretta
         const user = registeredUsers.find(u => u.username === username && u.password === password);
@@ -117,7 +132,7 @@ if (loginForm) {
         if (user) {
             currentUser = { username: user.username, id: user.id };
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            toggleModal(loginModal, false);
+            toggleModal(elements.loginModal, false);
             window.location.href = 'dashboard.html';
         } else {
             alert('Nome utente o password non validi!');
@@ -126,8 +141,8 @@ if (loginForm) {
 }
 
 // Gestione form di registrazione
-if (registerForm) {
-    registerForm.addEventListener('submit', (e) => {
+if (elements.registerForm) {
+    elements.registerForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const username = document.getElementById('username').value;
         const email = document.getElementById('email').value;
@@ -161,14 +176,14 @@ if (registerForm) {
         currentUser = { username: newUser.username, id: newUser.id };
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
         
-        toggleModal(registerModal, false);
+        toggleModal(elements.registerModal, false);
         window.location.href = 'dashboard.html';
     });
 }
 
 // Gestione logout
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
+if (elements.logoutBtn) {
+    elements.logoutBtn.addEventListener('click', () => {
         currentUser = null;
         localStorage.removeItem('currentUser');
         window.location.href = 'index.html';
@@ -314,22 +329,22 @@ function initGroups() {
     updateGroupsList();
     
     // Gestione del pulsante "Crea Gruppo"
-    if (createGroupBtn && createGroupModal) {
-        createGroupBtn.addEventListener('click', () => {
-            toggleModal(createGroupModal, true);
+    if (elements.createGroupBtn && elements.createGroupModal) {
+        elements.createGroupBtn.addEventListener('click', () => {
+            toggleModal(elements.createGroupModal, true);
         });
     }
     
     // Gestione del pulsante "Unisciti a un Gruppo"
-    if (joinGroupBtn && joinGroupModal) {
-        joinGroupBtn.addEventListener('click', () => {
-            toggleModal(joinGroupModal, true);
+    if (elements.joinGroupBtn && elements.joinGroupModal) {
+        elements.joinGroupBtn.addEventListener('click', () => {
+            toggleModal(elements.joinGroupModal, true);
         });
     }
     
     // Gestione del form per creare un gruppo
-    if (createGroupForm) {
-        createGroupForm.addEventListener('submit', (e) => {
+    if (elements.createGroupForm) {
+        elements.createGroupForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
             const userName = document.getElementById('userNameCreate').value.trim();
@@ -374,8 +389,8 @@ function initGroups() {
             saveData();
             
             // Chiudi il modale e resetta il form
-            toggleModal(createGroupModal, false);
-            createGroupForm.reset();
+            toggleModal(elements.createGroupModal, false);
+            elements.createGroupForm.reset();
             
             // Aggiorna la lista dei gruppi
             updateGroupsList();
@@ -385,8 +400,8 @@ function initGroups() {
     }
     
     // Gestione del form per unirsi a un gruppo
-    if (joinGroupForm) {
-        joinGroupForm.addEventListener('submit', (e) => {
+    if (elements.joinGroupForm) {
+        elements.joinGroupForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
             const userName = document.getElementById('userNameJoin').value.trim();
@@ -435,8 +450,8 @@ function initGroups() {
             saveData();
             
             // Chiudi il modale e resetta il form
-            toggleModal(joinGroupModal, false);
-            joinGroupForm.reset();
+            toggleModal(elements.joinGroupModal, false);
+            elements.joinGroupForm.reset();
             
             // Aggiorna la lista dei gruppi
             updateGroupsList();
@@ -498,9 +513,9 @@ function deleteExpense(expenseId) {
 
 // Funzione per aggiornare la lista dei gruppi
 function updateGroupsList() {
-    if (!groupsList) return;
+    if (!elements.groupsList) return;
     
-    groupsList.innerHTML = '';
+    elements.groupsList.innerHTML = '';
     
     // Filtra i gruppi per mostrare solo quelli di cui l'utente è membro
     const userGroups = groups.filter(group => 
@@ -532,7 +547,7 @@ function updateGroupsList() {
             </div>
         `;
         
-        groupsList.appendChild(groupCard);
+        elements.groupsList.appendChild(groupCard);
     });
 }
 
@@ -579,9 +594,9 @@ function updateUI() {
     document.getElementById('welcome').classList.toggle('hidden', isLoggedIn);
     document.getElementById('dashboard').classList.toggle('hidden', !isLoggedIn);
     document.getElementById('groups').classList.toggle('hidden', !isLoggedIn);
-    loginBtn.classList.toggle('hidden', isLoggedIn);
-    registerBtn.classList.toggle('hidden', isLoggedIn);
-    logoutBtn.classList.toggle('hidden', !isLoggedIn);
+    elements.loginBtn.classList.toggle('hidden', isLoggedIn);
+    elements.registerBtn.classList.toggle('hidden', isLoggedIn);
+    elements.logoutBtn.classList.toggle('hidden', !isLoggedIn);
 }
 
 function getFilteredExpenses() {
@@ -947,15 +962,15 @@ function updateGroupCharts(group, groupExpenses) {
 }
 
 // Gestione del menu mobile
-if (menuToggle && navLinks) {
-    menuToggle.addEventListener('click', () => {
-        navLinks.classList.toggle('active');
+if (elements.menuToggle && elements.navLinks) {
+    elements.menuToggle.addEventListener('click', () => {
+        elements.navLinks.classList.toggle('active');
     });
 
     // Chiudi il menu quando si clicca su un link
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', () => {
-            navLinks.classList.remove('active');
+            elements.navLinks.classList.remove('active');
         });
     });
 }
