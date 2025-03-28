@@ -19,6 +19,14 @@
 <body>
     <nav class="navbar">
         <div class="logo">AlcolTracker</div>
+        <div class="nav-links">
+            <button id="loginBtn" class="btn">Accedi</button>
+            <button id="registerBtn" class="btn">Registrati</button>
+            <button id="logoutBtn" class="btn hidden">Logout</button>
+        </div>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
     </nav>
 
     <main class="container">
@@ -35,10 +43,17 @@
     <!-- Modali -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
+            <span class="close">&times;</span>
             <h2>Accedi</h2>
             <form id="loginForm">
-                <input type="text" placeholder="Nome Utente" required>
-                <input type="password" placeholder="Password" required>
+                <div class="form-group">
+                    <label for="loginUsername">Nome Utente</label>
+                    <input type="text" id="loginUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
                 <button type="submit" class="btn">Accedi</button>
             </form>
         </div>
@@ -46,6 +61,7 @@
 
     <div id="registerModal" class="modal">
         <div class="modal-content">
+            <span class="close">&times;</span>
             <h2>Registrati</h2>
             <form id="registerForm">
                 <div class="form-group">
@@ -69,11 +85,11 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="./script.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register('./sw.js')
                     .then(registration => {
                         console.log('ServiceWorker registrato con successo:', registration.scope);
                     })
