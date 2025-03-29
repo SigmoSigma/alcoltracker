@@ -24,6 +24,7 @@ body {
 .navbar {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
     padding: 1rem 2rem;
     display: flex;
@@ -658,6 +659,8 @@ tr:hover {
 /* Ottimizzazioni per iOS */
 @supports (-webkit-touch-callout: none) {
     .navbar {
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
     }
 
@@ -786,65 +789,83 @@ tr:hover {
     width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    margin-top: 1rem;
 }
 
-.expenses-table {
+.expenses-list table {
     width: 100%;
-    min-width: 600px; /* Larghezza minima per mantenere la leggibilità */
-    border-collapse: separate;
-    border-spacing: 0;
+    border-collapse: collapse;
+    font-size: 0.9rem;
 }
 
-.expenses-table th,
-.expenses-table td {
-    padding: 1rem;
+.expenses-list th,
+.expenses-list td {
+    padding: 0.75rem;
     text-align: left;
-    white-space: nowrap;
+    border-bottom: 1px solid #eee;
 }
 
-.expenses-table th {
+.expenses-list th {
     background: #f8f9fa;
     font-weight: 600;
     color: #2c3e50;
     position: sticky;
     top: 0;
     z-index: 1;
+    white-space: nowrap;
 }
 
-.expenses-table tr:nth-child(even) {
+.expenses-list th:first-child {
+    width: 100px;
+}
+
+.expenses-list th:nth-child(2) {
+    width: 120px;
+}
+
+.expenses-list th:nth-child(3),
+.expenses-list th:nth-child(4) {
+    width: 80px;
+}
+
+.expenses-list th:last-child {
+    width: 100px;
+}
+
+.expenses-list tr:hover {
     background-color: #f8f9fa;
 }
 
-.expenses-table tr:hover {
-    background-color: #f1f1f1;
+.expenses-list .btn.delete {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
 }
 
-/* Media query per dispositivi mobili */
 @media (max-width: 768px) {
     .expenses-list {
         margin: 0 -1rem;
         padding: 0 1rem;
     }
 
-    .expenses-table {
-        font-size: 0.9rem;
+    .expenses-list table {
+        font-size: 0.8rem;
     }
 
-    .expenses-table th,
-    .expenses-table td {
-        padding: 0.8rem 0.5rem;
+    .expenses-list th,
+    .expenses-list td {
+        padding: 0.5rem;
     }
 
-    .expenses-table th:first-child,
-    .expenses-table td:first-child {
+    .expenses-list th:first-child,
+    .expenses-list td:first-child {
         position: sticky;
         left: 0;
         background: #f8f9fa;
         z-index: 2;
     }
 
-    .expenses-table th:last-child,
-    .expenses-table td:last-child {
+    .expenses-list th:last-child,
+    .expenses-list td:last-child {
         position: sticky;
         right: 0;
         background: #f8f9fa;
