@@ -406,7 +406,7 @@ function initGroups() {
             const groupName = document.getElementById('groupNameJoin').value.trim();
             const groupCode = document.getElementById('groupCodeJoin').value.trim();
             
-            console.log('Tentativo di unione al gruppo:', { userName, groupName, groupCode });
+            console.log('Tentativo di unione al gruppo:', { groupName, groupCode });
             console.log('Gruppi disponibili:', groups);
             
             if (!userName || !groupName || !groupCode) {
@@ -414,21 +414,14 @@ function initGroups() {
                 return;
             }
             
-            // Cerca il gruppo con il nome e il codice inseriti
-            const group = groups.find(g => {
-                const match = g.name.trim() === groupName && g.code.trim() === groupCode;
-                console.log('Confronto gruppo:', { 
-                    groupName: g.name, 
-                    inputName: groupName, 
-                    groupCode: g.code, 
-                    inputCode: groupCode, 
-                    match 
-                });
-                return match;
-            });
+            // Cerca il gruppo ignorando maiuscole/minuscole
+            const group = groups.find(g => 
+                g.name.toLowerCase() === groupName.toLowerCase() && 
+                g.code.toLowerCase() === groupCode.toLowerCase()
+            );
             
             if (!group) {
-                alert('Gruppo non trovato! Verifica il nome e il codice inseriti.');
+                alert('Gruppo non trovato. Verifica il nome e il codice del gruppo.');
                 return;
             }
             
@@ -471,7 +464,10 @@ function updateExpensesList() {
     
     expensesList.innerHTML = '';
     
-    expenses.forEach(expense => {
+    // Ordina le spese per data (più recenti in alto)
+    const sortedExpenses = [...expenses].sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    sortedExpenses.forEach(expense => {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${new Date(expense.date).toLocaleDateString()}</td>
@@ -479,7 +475,7 @@ function updateExpensesList() {
             <td>€${expense.amount.toFixed(2)}</td>
             <td>${expense.quantity.toFixed(2)} L</td>
             <td>
-                <button class="btn delete" onclick="deleteExpense('${expense.id}')"><i class="fas fa-trash"></i> Elimina</button>
+                <button class="btn delete" onclick="deleteExpense('${expense.id}')"><i class="fas fa-trash"></i></button>
             </td>
         `;
         expensesList.appendChild(row);
@@ -972,3 +968,13 @@ if (elements.menuToggle && elements.navLinks) {
         });
     });
 }
+
+// Event listeners per i pulsanti di chiusura dei modali
+document.querySelectorAll('.close').forEach(closeBtn => {
+    closeBtn.addEventListener('click', () => {
+        const modal = closeBtn.closest('.modal');
+        if (modal) {
+            toggleModal(modal, false);
+        }
+    });
+});
