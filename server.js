@@ -14,27 +14,42 @@ const app = express();
 
 // Middleware per il logging
 app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url} - Origin: ${req.headers.origin || 'none'}`);
+    console.log('Headers:', req.headers);
     next();
 });
 
 // Configura CORS prima di tutto
 app.use((req, res, next) => {
-    const allowedOrigins = ['https://alcoltracker.vercel.app', 'http://localhost:3000', 'https://*.vercel.app'];
+    const allowedOrigins = [
+        'https://alcoltracker.vercel.app',
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'https://*.vercel.app'
+    ];
+
     const origin = req.headers.origin;
     
-    // Permetti qualsiasi origine durante i test
-    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+    // Permetti l'origine se è nella lista o se siamo in sviluppo
+    if (allowedOrigins.includes(origin) || origin?.endsWith('.vercel.app')) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    } else {
+        // In sviluppo, permetti tutte le origini
+        res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+
+    // Headers essenziali per il funzionamento dell'API
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Accept-Version');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Max-Age', '86400'); // 24 ore
-    
-    // Gestione delle richieste preflight OPTIONS
+
+    // Gestione preflight OPTIONS
     if (req.method === 'OPTIONS') {
-        return res.status(200).end();
+        res.status(200).end();
+        return;
     }
-    
+
     next();
 });
 
