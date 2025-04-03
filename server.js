@@ -18,24 +18,24 @@ app.use((req, res, next) => {
     next();
 });
 
-// Configura CORS
-app.use(cors({
-    origin: ['https://alcoltracker.vercel.app', 'https://*.vercel.app', 'http://localhost:3000'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Accept-Version'],
-    exposedHeaders: ['Access-Control-Allow-Origin'],
-    credentials: true,
-    optionsSuccessStatus: 200,
-    preflightContinue: true
-}));
-
-// Middleware per gestire le richieste preflight OPTIONS
-app.options('*', (req, res) => {
-    res.header('Access-Control-Allow-Origin', req.headers.origin);
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With, Accept, Accept-Version');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.sendStatus(200);
+// Configura CORS prima di tutto
+app.use((req, res, next) => {
+    const allowedOrigins = ['https://alcoltracker.vercel.app', 'http://localhost:3000', 'https://*.vercel.app'];
+    const origin = req.headers.origin;
+    
+    // Permetti qualsiasi origine durante i test
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Accept-Version');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Max-Age', '86400'); // 24 ore
+    
+    // Gestione delle richieste preflight OPTIONS
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+    
+    next();
 });
 
 app.use(express.json());
@@ -528,31 +528,159 @@ app.post('/api/groups/:id/leave', authenticateToken, async (req, res) => {
     }
 });
 
+// Endpoint di test completo
+app.get('/api/system-check', async (req, res) => {
+    try {
+        // Test connessione database
+        let dbTest = {
+            status: 'disconnected',
+            error: null
+        };
+        
+        try {
+            await db.command({ ping: 1 });
+            dbTest.status = 'connected';
+        } catch (error) {
+            dbTest.status = 'error';
+            dbTest.error = error.message;
+        }
+
+        // Test variabili d'ambiente
+        const envTest = {
+            MONGODB_URI: process.env.MONGODB_URI ? 'configured' : 'missing',
+            JWT_SECRET: process.env.JWT_SECRET ? 'configured' : 'missing',
+            NODE_ENV: process.env.NODE_ENV || 'not set'
+        };
+
+        // Test CORS
+        const corsTest = {
+            headers: {
+                'Access-Control-Allow-Origin': res.getHeader('Access-Control-Allow-Origin') || 'not set',
+                'Access-Control-Allow-Methods': res.getHeader('Access-Control-Allow-Methods') || 'not set',
+                'Access-Control-Allow-Headers': res.getHeader('Access-Control-Allow-Headers') || 'not set',
+                'Access-Control-Allow-Credentials': res.getHeader('Access-Control-Allow-Credentials') || 'not set'
+            }
+        };
+
+        // Test collections
+        let collectionsTest = {
+            users: false,
+            groups: false,
+            expenses: false,
+            error: null
+        };
+
+        try {
+            const collections = await db.listCollections().toArray();
+            const collectionNames = collections.map(c => c.name);
+            collectionsTest.users = collectionNames.includes('users');
+            collectionsTest.groups = collectionNames.includes('groups');
+            collectionsTest.expenses = collectionNames.includes('expenses');
+        } catch (error) {
+            collectionsTest.error = error.message;
+        }
+
+        res.json({
+            timestamp: new Date().toISOString(),
+            server: {
+                status: 'running',
+                port: process.env.PORT || 3000,
+                environment: process.env.NODE_ENV || 'development'
+            },
+            database: dbTest,
+            environment: envTest,
+            cors: corsTest,
+            collections: collectionsTest,
+            request: {
+                origin: req.headers.origin || 'not set',
+                method: req.method,
+                path: req.path,
+                headers: req.headers
+            }
+        });
+    } catch (error) {
+        console.error('Errore nel system-check:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Errore durante il controllo del sistema',
+            error: error.message
+        });
+    }
+});
+
+// Endpoint di test per il login
+app.post('/api/auth/test-login', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        console.log('Test login attempt:', { username, timestamp: new Date().toISOString() });
+        
+        // Log dei dettagli della richiesta
+        console.log('Request headers:', req.headers);
+        console.log('Request body:', req.body);
+        
+        // Simula una risposta di successo per il test
+        res.json({
+            success: true,
+            message: 'Test login endpoint working',
+            requestDetails: {
+                headers: req.headers,
+                body: req.body,
+                timestamp: new Date().toISOString()
+            }
+        });
+    } catch (error) {
+        console.error('Test login error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message,
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+
 // Avvia il server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 async function startServer() {
     try {
         await connectToDb();
-        app.listen(PORT, () => {
-            console.log(`🚀 Server in esecuzione sulla porta ${PORT}`);
-            console.log('Database connesso:', process.env.MONGODB_URI ? 'Sì' : 'No');
-            console.log('JWT Secret configurato:', process.env.JWT_SECRET ? 'Sì' : 'No');
+        console.log('✅ Tentativo di avvio del server sulla porta', PORT);
+        console.log('✅ Variabili ambiente:', {
+            MONGODB_URI: process.env.MONGODB_URI ? 'configurato' : 'mancante',
+            JWT_SECRET: process.env.JWT_SECRET ? 'configurato' : 'mancante',
+            NODE_ENV: process.env.NODE_ENV || 'non impostato'
         });
+
+        const server = app.listen(PORT, () => {
+            console.log(`🚀 Server in esecuzione sulla porta ${PORT}`);
+            console.log('✅ Database connesso:', process.env.MONGODB_URI ? 'Sì' : 'No');
+            console.log('✅ JWT Secret configurato:', process.env.JWT_SECRET ? 'Sì' : 'No');
+            console.log('✅ Ambiente:', process.env.NODE_ENV || 'development');
+        });
+
+        server.on('error', (error) => {
+            console.error('❌ Errore del server:', error);
+            if (error.code === 'EADDRINUSE') {
+                console.error(`❌ La porta ${PORT} è già in uso`);
+            }
+        });
+
     } catch (error) {
         console.error('❌ Errore durante l\'avvio del server:', error);
-        console.error('Dettagli errore:', error.message);
+        console.error('❌ Dettagli errore:', error.message);
         process.exit(1);
     }
 }
 
-// Gestione degli errori non catturati
+// Gestione degli errori non catturati con più dettagli
 process.on('unhandledRejection', (error) => {
-    console.error('Errore non gestito:', error);
+    console.error('❌ Errore non gestito (Promise):', error);
+    console.error('Stack trace:', error.stack);
 });
 
 process.on('uncaughtException', (error) => {
-    console.error('Eccezione non catturata:', error);
+    console.error('❌ Eccezione non catturata:', error);
+    console.error('Stack trace:', error.stack);
 });
 
 startServer(); 
