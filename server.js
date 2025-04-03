@@ -24,34 +24,45 @@ app.use((req, res, next) => {
     const allowedOrigins = [
         'https://alcoltracker.vercel.app',
         'https://alcoltracker-git-main-antonios-projects-38f3e0d1.vercel.app',
+        'https://la-tua-app.vercel.app',
         'http://localhost:3000',
         'http://localhost:3001'
     ];
 
     const origin = req.headers.origin;
     
-    // Imposta l'origine corretta
-    if (origin && (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app'))) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-        res.setHeader('Access-Control-Allow-Credentials', 'true');
-        res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
-        res.setHeader('Access-Control-Max-Age', '86400'); // 24 ore
-    }
-
-    // Log per debugging
-    console.log('🔒 CORS Request:', {
+    // Log dettagliato della richiesta CORS
+    console.log('🔒 CORS Request Details:', {
         method: req.method,
         path: req.path,
-        origin: req.headers.origin,
-        contentType: req.headers['content-type'],
+        origin: origin,
         headers: req.headers
     });
+
+    // Imposta l'origine corretta
+    if (origin) {
+        if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+            res.setHeader('Access-Control-Allow-Origin', origin);
+            res.setHeader('Access-Control-Allow-Credentials', 'true');
+            res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+            res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+            res.setHeader('Access-Control-Max-Age', '86400'); // 24 ore
+
+            // Log degli header CORS impostati
+            console.log('🔒 CORS Headers Set:', {
+                origin: res.getHeader('Access-Control-Allow-Origin'),
+                methods: res.getHeader('Access-Control-Allow-Methods'),
+                headers: res.getHeader('Access-Control-Allow-Headers'),
+                credentials: res.getHeader('Access-Control-Allow-Credentials')
+            });
+        }
+    }
 
     // Gestione preflight OPTIONS
     if (req.method === 'OPTIONS') {
         console.log('👉 Handling OPTIONS request for path:', req.path);
-        return res.status(204).end();
+        res.status(204).end();
+        return;
     }
 
     next();
