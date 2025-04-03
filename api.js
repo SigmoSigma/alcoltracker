@@ -1,7 +1,7 @@
 // Configurazione API
 const API_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:3000/api'
-    : 'https://la-tua-app.vercel.app/api';
+    : 'https://alcoltracker.vercel.app/api';
 
 // Funzioni per l'autenticazione
 export async function register(username, password) {
@@ -281,6 +281,104 @@ export async function leaveGroup(groupId) {
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || 'Errore durante l\'uscita dal gruppo');
+    }
+
+    return await response.json();
+}
+
+// Funzioni per la gestione dei record
+export async function getRecords() {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Utente non autenticato');
+
+    const response = await fetch(`${API_URL}/records`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Errore durante il recupero dei record');
+    }
+
+    return await response.json();
+}
+
+export async function addRecord(date, drinks) {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Utente non autenticato');
+
+    const response = await fetch(`${API_URL}/records`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ date, drinks }),
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Errore durante l\'aggiunta del record');
+    }
+
+    return await response.json();
+}
+
+export async function updateRecord(recordId, date, drinks) {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Utente non autenticato');
+
+    const response = await fetch(`${API_URL}/records/${recordId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ date, drinks }),
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Errore durante l\'aggiornamento del record');
+    }
+
+    return await response.json();
+}
+
+export async function deleteRecord(recordId) {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Utente non autenticato');
+
+    const response = await fetch(`${API_URL}/records/${recordId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Errore durante l\'eliminazione del record');
+    }
+
+    return await response.json();
+}
+
+export async function getRecordStats() {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Utente non autenticato');
+
+    const response = await fetch(`${API_URL}/records/stats`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Errore durante il recupero delle statistiche');
     }
 
     return await response.json();

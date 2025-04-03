@@ -19,7 +19,7 @@ try {
 // Configurazione API
 const API_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:3000/api'
-    : 'https://la-tua-app.vercel.app/api';  // Questo URL verrà aggiornato dopo il deploy
+    : 'https://alcoltracker.vercel.app/api';  // URL aggiornato dopo il deploy
 
 // Funzione per verificare se l'utente è autenticato
 async function checkAuth() {

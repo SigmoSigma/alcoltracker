@@ -31,15 +31,14 @@ app.use((req, res, next) => {
 
     const origin = req.headers.origin;
     
-    // Log dettagliato della richiesta CORS
-    console.log('🔒 CORS Request Details:', {
+    console.log('🔒 Richiesta ricevuta:', {
         method: req.method,
         path: req.path,
         origin: origin,
         headers: req.headers
     });
 
-    // Imposta l'origine corretta
+    // Imposta gli header CORS per tutte le richieste
     if (origin) {
         if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
             res.setHeader('Access-Control-Allow-Origin', origin);
@@ -47,20 +46,40 @@ app.use((req, res, next) => {
             res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
             res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
             res.setHeader('Access-Control-Max-Age', '86400'); // 24 ore
-
-            // Log degli header CORS impostati
-            console.log('🔒 CORS Headers Set:', {
-                origin: res.getHeader('Access-Control-Allow-Origin'),
-                methods: res.getHeader('Access-Control-Allow-Methods'),
-                headers: res.getHeader('Access-Control-Allow-Headers'),
-                credentials: res.getHeader('Access-Control-Allow-Credentials')
-            });
         }
     }
 
-    // Gestione preflight OPTIONS
+    // Log degli header impostati
+    console.log('🔒 Header impostati:', {
+        'access-control-allow-origin': res.getHeader('Access-Control-Allow-Origin'),
+        'access-control-allow-credentials': res.getHeader('Access-Control-Allow-Credentials'),
+        'access-control-allow-methods': res.getHeader('Access-Control-Allow-Methods'),
+        'access-control-allow-headers': res.getHeader('Access-Control-Allow-Headers'),
+        'access-control-max-age': res.getHeader('Access-Control-Max-Age')
+    });
+
+    // Gestione specifica delle richieste OPTIONS
     if (req.method === 'OPTIONS') {
-        console.log('👉 Handling OPTIONS request for path:', req.path);
+        console.log('👉 Gestione richiesta OPTIONS per:', req.path);
+        // Imposta gli header specifici per il preflight
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+        res.setHeader('Access-Control-Max-Age', '86400');
+        
+        // Log della risposta OPTIONS
+        console.log('👉 Risposta OPTIONS:', {
+            status: 204,
+            headers: {
+                'access-control-allow-origin': res.getHeader('Access-Control-Allow-Origin'),
+                'access-control-allow-credentials': res.getHeader('Access-Control-Allow-Credentials'),
+                'access-control-allow-methods': res.getHeader('Access-Control-Allow-Methods'),
+                'access-control-allow-headers': res.getHeader('Access-Control-Allow-Headers'),
+                'access-control-max-age': res.getHeader('Access-Control-Max-Age')
+            }
+        });
+        
         res.status(204).end();
         return;
     }
@@ -195,17 +214,31 @@ app.post('/api/auth/register', async (req, res) => {
 // API per il login
 app.post('/api/auth/login', async (req, res) => {
     try {
+        console.log('🔐 Tentativo di login:', {
+            timestamp: new Date().toISOString(),
+            headers: req.headers,
+            origin: req.headers.origin,
+            method: req.method,
+            path: req.path,
+            body: {
+                username: req.body.username,
+                passwordLength: req.body.password ? req.body.password.length : 0
+            }
+        });
+
         const { username, password } = req.body;
 
         // Trova l'utente
         const user = await db.collection('users').findOne({ username });
         if (!user) {
+            console.log('❌ Login fallito: utente non trovato -', username);
             return res.status(400).json({ message: 'Username o password non validi' });
         }
 
         // Verifica la password
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) {
+            console.log('❌ Login fallito: password non valida -', username);
             return res.status(400).json({ message: 'Username o password non validi' });
         }
 
@@ -216,12 +249,27 @@ app.post('/api/auth/login', async (req, res) => {
             { expiresIn: '24h' }
         );
 
+        console.log('✅ Login riuscito:', {
+            username,
+            userId: user._id,
+            timestamp: new Date().toISOString()
+        });
+
+        // Log degli header CORS prima di inviare la risposta
+        console.log('🔒 CORS Headers nella risposta di login:', {
+            'Access-Control-Allow-Origin': res.getHeader('Access-Control-Allow-Origin'),
+            'Access-Control-Allow-Credentials': res.getHeader('Access-Control-Allow-Credentials'),
+            'Access-Control-Allow-Methods': res.getHeader('Access-Control-Allow-Methods'),
+            'Access-Control-Allow-Headers': res.getHeader('Access-Control-Allow-Headers')
+        });
+
         res.json({
             token,
             user: { id: user._id, username: user.username }
         });
     } catch (error) {
-        console.error('Errore durante il login:', error);
+        console.error('❌ Errore durante il login:', error);
+        console.error('Stack trace:', error.stack);
         res.status(500).json({ message: 'Errore durante il login' });
     }
 });
@@ -696,6 +744,169 @@ app.post('/api/auth/test-login', async (req, res) => {
             error: error.message,
             timestamp: new Date().toISOString()
         });
+    }
+});
+
+// API per i record
+// Ottieni tutti i record dell'utente
+app.get('/api/records', authenticateToken, async (req, res) => {
+    try {
+        const records = await db.collection('records')
+            .find({ userId: req.user.id.toString() })
+            .sort({ date: -1 })
+            .toArray();
+        res.json(records);
+    } catch (error) {
+        console.error('Errore nel recupero dei record:', error);
+        res.status(500).json({ message: 'Errore nel recupero dei record' });
+    }
+});
+
+// Aggiungi un nuovo record
+app.post('/api/records', authenticateToken, async (req, res) => {
+    try {
+        const { date, drinks } = req.body;
+        
+        const record = {
+            date: new Date(date),
+            drinks: drinks.map(drink => ({
+                name: drink.name,
+                quantity: parseFloat(drink.quantity),
+                alcoholContent: parseFloat(drink.alcoholContent)
+            })),
+            userId: req.user.id.toString(),
+            username: req.user.username,
+            createdAt: new Date()
+        };
+
+        const result = await db.collection('records').insertOne(record);
+        res.status(201).json({ ...record, _id: result.insertedId });
+    } catch (error) {
+        console.error('Errore nell\'aggiunta del record:', error);
+        res.status(500).json({ message: 'Errore nell\'aggiunta del record' });
+    }
+});
+
+// Modifica un record esistente
+app.put('/api/records/:id', authenticateToken, async (req, res) => {
+    try {
+        const { date, drinks } = req.body;
+        
+        // Verifica che l'ID sia valido
+        if (!ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ message: 'ID record non valido' });
+        }
+
+        const record = {
+            date: new Date(date),
+            drinks: drinks.map(drink => ({
+                name: drink.name,
+                quantity: parseFloat(drink.quantity),
+                alcoholContent: parseFloat(drink.alcoholContent)
+            })),
+            updatedAt: new Date()
+        };
+
+        const result = await db.collection('records').updateOne(
+            { 
+                _id: new ObjectId(req.params.id),
+                userId: req.user.id.toString()
+            },
+            { $set: record }
+        );
+
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ message: 'Record non trovato' });
+        }
+
+        res.json({ message: 'Record aggiornato con successo' });
+    } catch (error) {
+        console.error('Errore nell\'aggiornamento del record:', error);
+        res.status(500).json({ message: 'Errore nell\'aggiornamento del record' });
+    }
+});
+
+// Elimina un record
+app.delete('/api/records/:id', authenticateToken, async (req, res) => {
+    try {
+        // Verifica che l'ID sia valido
+        if (!ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ message: 'ID record non valido' });
+        }
+
+        const result = await db.collection('records').deleteOne({
+            _id: new ObjectId(req.params.id),
+            userId: req.user.id.toString()
+        });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ message: 'Record non trovato' });
+        }
+
+        res.json({ message: 'Record eliminato con successo' });
+    } catch (error) {
+        console.error('Errore nell\'eliminazione del record:', error);
+        res.status(500).json({ message: 'Errore nell\'eliminazione del record' });
+    }
+});
+
+// Ottieni le statistiche dei record
+app.get('/api/records/stats', authenticateToken, async (req, res) => {
+    try {
+        const records = await db.collection('records')
+            .find({ userId: req.user.id.toString() })
+            .toArray();
+
+        const stats = {
+            totalDrinks: 0,
+            totalAlcohol: 0,
+            byDrinkType: {},
+            byDate: {}
+        };
+
+        records.forEach(record => {
+            const date = record.date.toISOString().split('T')[0];
+            if (!stats.byDate[date]) {
+                stats.byDate[date] = {
+                    totalDrinks: 0,
+                    totalAlcohol: 0,
+                    drinks: {}
+                };
+            }
+
+            record.drinks.forEach(drink => {
+                // Statistiche globali
+                stats.totalDrinks += drink.quantity;
+                stats.totalAlcohol += (drink.quantity * drink.alcoholContent);
+
+                // Statistiche per tipo di bevanda
+                if (!stats.byDrinkType[drink.name]) {
+                    stats.byDrinkType[drink.name] = {
+                        quantity: 0,
+                        totalAlcohol: 0
+                    };
+                }
+                stats.byDrinkType[drink.name].quantity += drink.quantity;
+                stats.byDrinkType[drink.name].totalAlcohol += (drink.quantity * drink.alcoholContent);
+
+                // Statistiche per data
+                if (!stats.byDate[date].drinks[drink.name]) {
+                    stats.byDate[date].drinks[drink.name] = {
+                        quantity: 0,
+                        totalAlcohol: 0
+                    };
+                }
+                stats.byDate[date].totalDrinks += drink.quantity;
+                stats.byDate[date].totalAlcohol += (drink.quantity * drink.alcoholContent);
+                stats.byDate[date].drinks[drink.name].quantity += drink.quantity;
+                stats.byDate[date].drinks[drink.name].totalAlcohol += (drink.quantity * drink.alcoholContent);
+            });
+        });
+
+        res.json(stats);
+    } catch (error) {
+        console.error('Errore nel recupero delle statistiche:', error);
+        res.status(500).json({ message: 'Errore nel recupero delle statistiche' });
     }
 });
 
