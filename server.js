@@ -20,15 +20,23 @@ app.use((req, res, next) => {
 
 // Configura CORS
 app.use(cors({
-    origin: 'https://alcoltracker.vercel.app',
+    origin: ['https://alcoltracker.vercel.app', 'https://*.vercel.app', 'http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Accept-Version'],
+    exposedHeaders: ['Access-Control-Allow-Origin'],
     credentials: true,
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200,
+    preflightContinue: true
 }));
 
-// Aggiungi gestione OPTIONS per le richieste preflight
-app.options('*', cors());
+// Middleware per gestire le richieste preflight OPTIONS
+app.options('*', (req, res) => {
+    res.header('Access-Control-Allow-Origin', req.headers.origin);
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With, Accept, Accept-Version');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.sendStatus(200);
+});
 
 app.use(express.json());
 
