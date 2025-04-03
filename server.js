@@ -14,9 +14,10 @@ const app = express();
 
 // Configura CORS
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://alcoltracker.vercel.app'],
+    origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://alcoltracker.vercel.app', 'https://*.vercel.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
 }));
 
 app.use(express.json());
@@ -512,11 +513,23 @@ async function startServer() {
         await connectToDb();
         app.listen(PORT, () => {
             console.log(`🚀 Server in esecuzione sulla porta ${PORT}`);
+            console.log('Database connesso:', process.env.MONGODB_URI ? 'Sì' : 'No');
+            console.log('JWT Secret configurato:', process.env.JWT_SECRET ? 'Sì' : 'No');
         });
     } catch (error) {
         console.error('❌ Errore durante l\'avvio del server:', error);
+        console.error('Dettagli errore:', error.message);
         process.exit(1);
     }
 }
+
+// Gestione degli errori non catturati
+process.on('unhandledRejection', (error) => {
+    console.error('Errore non gestito:', error);
+});
+
+process.on('uncaughtException', (error) => {
+    console.error('Eccezione non catturata:', error);
+});
 
 startServer(); 
