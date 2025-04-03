@@ -4,6 +4,7 @@
     "description": "Applicazione per il tracciamento delle spese di gruppo",
     "start_url": "/",
     "display": "standalone",
+    "orientation": "landscape",
     "background_color": "#ffffff",
     "theme_color": "#000000",
     "icons": [

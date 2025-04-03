@@ -1357,6 +1357,14 @@ document.addEventListener('DOMContentLoaded', () => {
             e.target.classList.remove('active');
         }
     });
+
+    // Forza l'orientamento orizzontale
+    if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock('landscape')
+            .catch(function(error) {
+                console.log("Orientamento non supportato:", error);
+            });
+    }
 });
 
 // Funzione per il logout
