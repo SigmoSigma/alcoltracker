@@ -23,37 +23,72 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
     const allowedOrigins = [
         'https://alcoltracker.vercel.app',
+        'https://alcoltracker-git-main-antonios-projects-38f3e0d1.vercel.app',
         'http://localhost:3000',
-        'http://localhost:3001',
-        'https://*.vercel.app'
+        'http://localhost:3001'
     ];
 
     const origin = req.headers.origin;
     
-    // Permetti l'origine se è nella lista o se siamo in sviluppo
-    if (allowedOrigins.includes(origin) || origin?.endsWith('.vercel.app')) {
+    // Imposta l'origine corretta
+    if (origin && (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app'))) {
         res.setHeader('Access-Control-Allow-Origin', origin);
-    } else {
-        // In sviluppo, permetti tutte le origini
-        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+        res.setHeader('Access-Control-Max-Age', '86400'); // 24 ore
     }
 
-    // Headers essenziali per il funzionamento dell'API
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Max-Age', '86400'); // 24 ore
+    // Log per debugging
+    console.log('🔒 CORS Request:', {
+        method: req.method,
+        path: req.path,
+        origin: req.headers.origin,
+        contentType: req.headers['content-type'],
+        headers: req.headers
+    });
 
     // Gestione preflight OPTIONS
     if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
+        console.log('👉 Handling OPTIONS request for path:', req.path);
+        return res.status(204).end();
     }
 
     next();
 });
 
-app.use(express.json());
+// Middleware per il parsing del body JSON con gestione errori
+app.use(express.json({
+    verify: (req, res, buf) => {
+        try {
+            JSON.parse(buf);
+        } catch (e) {
+            console.error('❌ Invalid JSON:', e);
+            res.status(400).json({ message: 'Invalid JSON payload' });
+            throw new Error('Invalid JSON payload');
+        }
+    }
+}));
+
+// Middleware per il logging delle richieste
+app.use((req, res, next) => {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] ${req.method} ${req.url}`);
+    console.log('Headers:', JSON.stringify(req.headers, null, 2));
+    
+    if (req.method === 'POST' || req.method === 'PUT') {
+        console.log('Body:', JSON.stringify(req.body, null, 2));
+    }
+    
+    // Intercetta la risposta
+    const oldJson = res.json;
+    res.json = function(data) {
+        console.log('Response:', JSON.stringify(data, null, 2));
+        return oldJson.apply(res, arguments);
+    };
+    
+    next();
+});
 
 // Servi i file statici
 app.use(express.static(__dirname));
