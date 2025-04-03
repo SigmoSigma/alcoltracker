@@ -3,124 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - AlcolTracker</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2c3e50">
+    <title>Dashboard - DrinkStats</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo">AlcolTracker</div>
-        <div class="menu-toggle">
+        <div class="nav-brand">DrinkStats</div>
+        <button class="menu-toggle">
             <i class="fas fa-bars"></i>
-        </div>
+        </button>
         <div class="nav-links">
             <a href="dashboard.html" class="nav-link active">Dashboard</a>
             <a href="expenses.html" class="nav-link">Spese</a>
             <a href="groups.html" class="nav-link">Gruppi</a>
-            <button id="logoutBtn" class="btn">Esci</button>
+            <button id="logoutBtn" class="nav-link">Logout</button>
         </div>
     </nav>
 
-    <main class="container">
-        <section class="section">
-            <div class="dashboard-header">
-                <h2>La tua Dashboard</h2>
-                <div class="period-selector">
-                    <label for="periodSelect">Periodo:</label>
-                    <select id="periodSelect" class="period-select">
-                        <option value="2025">2025</option>
-                        <option value="2025-01">Gennaio 2025</option>
-                        <option value="2025-02">Febbraio 2025</option>
-                        <option value="2025-03">Marzo 2025</option>
-                        <option value="2025-04">Aprile 2025</option>
-                        <option value="2025-05">Maggio 2025</option>
-                        <option value="2025-06">Giugno 2025</option>
-                        <option value="2025-07">Luglio 2025</option>
-                        <option value="2025-08">Agosto 2025</option>
-                        <option value="2025-09">Settembre 2025</option>
-                        <option value="2025-10">Ottobre 2025</option>
-                        <option value="2025-11">Novembre 2025</option>
-                        <option value="2025-12">Dicembre 2025</option>
-                    </select>
-                </div>
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Dashboard</h1>
+            <div class="period-select-container">
+                <label for="periodSelect">Periodo:</label>
+                <select id="periodSelect" class="period-select"></select>
             </div>
-            
-            <div class="stats-container">
-                <div class="stat-card">
-                    <h3>Totale Spese</h3>
-                    <p id="totalYearExpense">€0.00</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Totale Litri</h3>
-                    <p id="monthlyExpense">0.00 L</p>
-                </div>
-            </div>
+        </div>
 
-            <div class="charts-container">
-                <div class="chart-card">
-                    <h3>Distribuzione Spese per Tipo</h3>
-                    <canvas id="typeChart"></canvas>
-                </div>
-                <div class="chart-card">
-                    <h3>Distribuzione Litri per Tipo</h3>
-                    <canvas id="quantityChart"></canvas>
-                </div>
+        <div class="stats-container">
+            <div class="stat-card purple">
+                <h3>Totale Spese</h3>
+                <p id="totalExpense">€0.00</p>
             </div>
+            <div class="stat-card green">
+                <h3>Totale Litri</h3>
+                <p id="totalLiters">0.00 L</p>
+            </div>
+        </div>
 
-            <div class="details-table">
-                <h3>Dettaglio Spese per Tipo</h3>
-                <table>
+        <div class="summary-section">
+            <h2>Riassunto per Tipo di Bevanda</h2>
+            <div class="table-container">
+                <table class="summary-table">
                     <thead>
                         <tr>
                             <th>Tipo</th>
-                            <th>Importo Totale</th>
-                            <th>Quantità Totale (L)</th>
+                            <th>Totale Spese</th>
+                            <th>Totale Litri</th>
                         </tr>
                     </thead>
-                    <tbody id="expenseTableBody">
-                        <tr>
-                            <td>Birra</td>
-                            <td>€0.00</td>
-                            <td>0.00 L</td>
-                        </tr>
-                        <tr>
-                            <td>Vino</td>
-                            <td>€0.00</td>
-                            <td>0.00 L</td>
-                        </tr>
-                        <tr>
-                            <td>Superalcolici</td>
-                            <td>€0.00</td>
-                            <td>0.00 L</td>
-                        </tr>
-                        <tr>
-                            <td>Spritz</td>
-                            <td>€0.00</td>
-                            <td>0.00 L</td>
-                        </tr>
+                    <tbody id="drinksSummaryList">
                     </tbody>
                 </table>
             </div>
-        </section>
-    </main>
+        </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="script.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registrato con successo:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('Registrazione ServiceWorker fallita:', error);
-                    });
-            });
-        }
-    </script>
+        <div class="charts-container">
+            <div class="chart-card">
+                <canvas id="expensesByType"></canvas>
+            </div>
+            <div class="chart-card">
+                <canvas id="quantityByType"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
 </body>
 </html> 

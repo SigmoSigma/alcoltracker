@@ -6,7 +6,7 @@
     <title>Gruppi - AlcolTracker</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2c3e50">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -20,54 +20,50 @@
             <a href="dashboard.html" class="nav-link">Dashboard</a>
             <a href="expenses.html" class="nav-link">Spese</a>
             <a href="groups.html" class="nav-link active">Gruppi</a>
-            <button id="logoutBtn" class="btn">Esci</button>
+            <button id="logoutBtn" class="btn">Logout</button>
         </div>
     </nav>
 
     <main class="container">
-        <section class="section">
+        <section id="groups" class="section">
             <div class="groups-header">
-                <h2>I tuoi Gruppi</h2>
-                <div class="groups-actions">
-                    <button id="joinGroupBtn" class="btn btn-secondary">
-                        <i class="fas fa-user-plus"></i> Unisciti a un Gruppo
+                <h1>I Miei Gruppi</h1>
+                <div class="group-actions">
+                    <button id="createGroupBtn" class="btn primary">
+                        <i class="fas fa-plus"></i> Crea Gruppo
                     </button>
-                    <button id="createGroupBtn" class="btn">
-                        <i class="fas fa-plus"></i> Crea Nuovo Gruppo
+                    <button id="joinGroupBtn" class="btn secondary">
+                        <i class="fas fa-user-plus"></i> Unisciti a un Gruppo
                     </button>
                 </div>
             </div>
 
-            <div id="groupsList" class="groups-list">
+            <div id="groupsList" class="groups-grid">
                 <!-- I gruppi verranno inseriti qui dinamicamente -->
             </div>
         </section>
     </main>
 
-    <!-- Modale per creare gruppo -->
+    <!-- Modale per creare un gruppo -->
     <div id="createGroupModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>Crea Nuovo Gruppo</h2>
             <form id="createGroupForm">
                 <div class="form-group">
-                    <label for="userNameCreate">Il tuo Nome Utente</label>
-                    <input type="text" id="userNameCreate" required>
-                </div>
-                <div class="form-group">
                     <label for="groupName">Nome del Gruppo</label>
-                    <input type="text" id="groupName" required>
+                    <input type="text" id="groupName" name="groupName" required>
                 </div>
                 <div class="form-group">
                     <label for="groupDescription">Descrizione</label>
-                    <textarea id="groupDescription" required></textarea>
+                    <textarea id="groupDescription" name="groupDescription" rows="3"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="groupCode">Codice di Accesso (obbligatorio)</label>
-                    <input type="text" id="groupCode" required>
-                    <small>Questo codice servirà agli altri utenti per unirsi al gruppo</small>
+                    <label for="groupCode">Codice di Accesso</label>
+                    <input type="text" id="groupCode" name="groupCode" required>
+                    <small>Questo codice sarà necessario per gli altri utenti per unirsi al gruppo</small>
                 </div>
-                <button type="submit" class="btn">Crea Gruppo</button>
+                <button type="submit" class="btn primary">Crea Gruppo</button>
             </form>
         </div>
     </div>
@@ -79,35 +75,18 @@
             <h2>Unisciti a un Gruppo</h2>
             <form id="joinGroupForm">
                 <div class="form-group">
-                    <label for="userNameJoin">Il tuo Nome Utente</label>
-                    <input type="text" id="userNameJoin" required>
+                    <label for="joinGroupName">Nome del Gruppo</label>
+                    <input type="text" id="joinGroupName" name="groupName" required>
                 </div>
                 <div class="form-group">
-                    <label for="groupNameJoin">Nome del Gruppo</label>
-                    <input type="text" id="groupNameJoin" required>
+                    <label for="joinGroupCode">Codice di Accesso</label>
+                    <input type="text" id="joinGroupCode" name="groupCode" required>
                 </div>
-                <div class="form-group">
-                    <label for="groupCodeJoin">Codice del Gruppo</label>
-                    <input type="text" id="groupCodeJoin" required>
-                </div>
-                <button type="submit" class="btn">Unisciti al Gruppo</button>
+                <button type="submit" class="btn primary">Unisciti</button>
             </form>
         </div>
     </div>
 
-    <script src="script.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registrato con successo:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('Registrazione ServiceWorker fallita:', error);
-                    });
-            });
-        }
-    </script>
+    <script type="module" src="./script.js"></script>
 </body>
 </html> 

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AlcolTracker - Monitora le tue spese alcoliche</title>
+    <link rel="icon" type="image/x-icon" href="./icons/favicon.ico">
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2c3e50">
     <!-- Meta tag per iOS -->
@@ -30,6 +31,7 @@
     <link rel="stylesheet" href="./style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <nav class="navbar">
@@ -49,9 +51,13 @@
             <h1>Benvenuto in AlcolTracker</h1>
             <p>Monitora le tue spese alcoliche in modo intelligente</p>
             <div class="welcome-buttons">
-                <button id="welcomeLoginBtn" class="btn">Accedi</button>
-                <button id="welcomeRegisterBtn" class="btn">Registrati</button>
+                <button id="welcomeLoginBtn" class="btn primary">Accedi</button>
+                <button id="welcomeRegisterBtn" class="btn secondary">Registrati</button>
             </div>
+        </section>
+
+        <section id="dashboard" class="section hidden">
+            <!-- Il contenuto della dashboard verrà caricato dinamicamente -->
         </section>
     </main>
 
@@ -62,15 +68,16 @@
             <h2>Accedi</h2>
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="loginUsername">Nome Utente</label>
+                    <label for="loginUsername">Username</label>
                     <input type="text" id="loginUsername" required>
                 </div>
                 <div class="form-group">
                     <label for="loginPassword">Password</label>
                     <input type="password" id="loginPassword" required>
                 </div>
-                <button type="submit" class="btn">Accedi</button>
+                <button type="submit" class="btn primary">Accedi</button>
             </form>
+            <p>Non hai un account? <a href="#" id="showRegister">Registrati</a></p>
         </div>
     </div>
 
@@ -80,35 +87,23 @@
             <h2>Registrati</h2>
             <form id="registerForm">
                 <div class="form-group">
-                    <label for="username">Nome Utente</label>
-                    <input type="text" id="username" required>
+                    <label for="registerUsername">Username</label>
+                    <input type="text" id="registerUsername" required>
                 </div>
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" required>
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" required>
                 </div>
                 <div class="form-group">
                     <label for="confirmPassword">Conferma Password</label>
                     <input type="password" id="confirmPassword" required>
                 </div>
-                <button type="submit" class="btn">Registrati</button>
+                <button type="submit" class="btn primary">Registrati</button>
             </form>
+            <p>Hai già un account? <a href="#" id="showLogin">Accedi</a></p>
         </div>
     </div>
 
-    <script src="./script.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registrato con successo:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('Registrazione ServiceWorker fallita:', error);
-                    });
-            });
-        }
-    </script>
+    <script type="module" src="script.js"></script>
 </body>
 </html> 

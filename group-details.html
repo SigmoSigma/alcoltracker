@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <nav class="navbar">
@@ -29,23 +30,34 @@
             <div class="group-details-header">
                 <div class="header-top">
                     <h2 id="groupName">Nome del Gruppo</h2>
-                    <div class="period-selector">
-                        <label for="periodSelect">Periodo:</label>
-                        <select id="periodSelect" class="period-select">
-                            <option value="2025">2025</option>
-                            <option value="2025-01">Gennaio 2025</option>
-                            <option value="2025-02">Febbraio 2025</option>
-                            <option value="2025-03">Marzo 2025</option>
-                            <option value="2025-04">Aprile 2025</option>
-                            <option value="2025-05">Maggio 2025</option>
-                            <option value="2025-06">Giugno 2025</option>
-                            <option value="2025-07">Luglio 2025</option>
-                            <option value="2025-08">Agosto 2025</option>
-                            <option value="2025-09">Settembre 2025</option>
-                            <option value="2025-10">Ottobre 2025</option>
-                            <option value="2025-11">Novembre 2025</option>
-                            <option value="2025-12">Dicembre 2025</option>
-                        </select>
+                    <div class="group-actions">
+                        <div class="period-selector">
+                            <label for="periodSelect">Periodo:</label>
+                            <select id="periodSelect" class="period-select">
+                                <option value="2025">2025</option>
+                                <option value="2025-01">Gennaio 2025</option>
+                                <option value="2025-02">Febbraio 2025</option>
+                                <option value="2025-03">Marzo 2025</option>
+                                <option value="2025-04">Aprile 2025</option>
+                                <option value="2025-05">Maggio 2025</option>
+                                <option value="2025-06">Giugno 2025</option>
+                                <option value="2025-07">Luglio 2025</option>
+                                <option value="2025-08">Agosto 2025</option>
+                                <option value="2025-09">Settembre 2025</option>
+                                <option value="2025-10">Ottobre 2025</option>
+                                <option value="2025-11">Novembre 2025</option>
+                                <option value="2025-12">Dicembre 2025</option>
+                            </select>
+                        </div>
+                        <button id="addExpenseBtn" class="btn primary">
+                            <i class="fas fa-plus"></i> Aggiungi Spesa
+                        </button>
+                        <button id="deleteGroupBtn" class="btn danger">
+                            <i class="fas fa-trash"></i> Elimina Gruppo
+                        </button>
+                        <button id="leaveGroupBtn" class="btn warning">
+                            <i class="fas fa-sign-out-alt"></i> Lascia Gruppo
+                        </button>
                     </div>
                 </div>
                 <p id="groupDescription" class="group-description"></p>
@@ -94,19 +106,38 @@
         </section>
     </main>
 
-    <script src="script.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registrato con successo:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('Registrazione ServiceWorker fallita:', error);
-                    });
-            });
-        }
-    </script>
+    <!-- Modale per aggiungere una spesa -->
+    <div id="expenseModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Aggiungi Spesa</h2>
+            <form id="expenseForm">
+                <div class="form-group">
+                    <label for="expenseType">Tipo di Bevanda</label>
+                    <select id="expenseType" name="type" required>
+                        <option value="beer">Birra</option>
+                        <option value="wine">Vino</option>
+                        <option value="spirits">Superalcolici</option>
+                        <option value="spritz">Spritz</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="expenseAmount">Importo (€)</label>
+                    <input type="number" id="expenseAmount" name="amount" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="expenseQuantity">Quantità (L)</label>
+                    <input type="number" id="expenseQuantity" name="quantity" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="expenseDate">Data</label>
+                    <input type="date" id="expenseDate" name="date" required>
+                </div>
+                <button type="submit" class="btn primary">Aggiungi Spesa</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
 </body>
 </html> 
