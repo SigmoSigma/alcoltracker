@@ -12,13 +12,23 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+// Middleware per il logging
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+});
+
 // Configura CORS
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://alcoltracker.vercel.app', 'https://*.vercel.app'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    origin: 'https://alcoltracker.vercel.app',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
+    credentials: true,
+    optionsSuccessStatus: 200
 }));
+
+// Aggiungi gestione OPTIONS per le richieste preflight
+app.options('*', cors());
 
 app.use(express.json());
 
@@ -413,7 +423,12 @@ app.get('/api/auth/verify', authenticateToken, (req, res) => {
 
 // Endpoint per il controllo dello stato del server
 app.get('/api/health-check', (req, res) => {
-    res.status(200).json({ status: 'ok' });
+    res.status(200).json({ 
+        status: 'ok',
+        dbStatus: db ? 'connected' : 'disconnected',
+        mongoUri: process.env.MONGODB_URI ? 'configured' : 'missing',
+        jwtSecret: process.env.JWT_SECRET ? 'configured' : 'missing'
+    });
 });
 
 // Elimina un gruppo
