@@ -1255,20 +1255,42 @@ function initializeMenu() {
     const navLinks = document.querySelector('.nav-links');
     
     if (menuToggle && navLinks) {
-        menuToggle.addEventListener('click', () => {
+        // Aggiungi l'evento click al pulsante del menu
+        menuToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            menuToggle.classList.toggle('active');
             navLinks.classList.toggle('active');
-            // Chiudi il menu quando si clicca su un link
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', () => {
-                    navLinks.classList.remove('active');
-                });
+        });
+
+        // Chiudi il menu quando si clicca su un link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.classList.remove('active');
+                navLinks.classList.remove('active');
             });
         });
 
         // Chiudi il menu quando si clicca fuori
         document.addEventListener('click', (e) => {
             if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
+                menuToggle.classList.remove('active');
                 navLinks.classList.remove('active');
+            }
+        });
+
+        // Gestione del touch
+        menuToggle.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            menuToggle.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        // Impedisci lo scroll del body quando il menu è aperto
+        navLinks.addEventListener('touchmove', (e) => {
+            if (navLinks.classList.contains('active')) {
+                e.preventDefault();
             }
         });
     }
