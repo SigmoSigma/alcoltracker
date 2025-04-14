@@ -1250,111 +1250,27 @@ function updateGroupCharts(group, groupExpenses) {
 }
 
 // Gestione del menu mobile
-if (elements.menuToggle && elements.navLinks) {
-    elements.menuToggle.addEventListener('click', () => {
-        elements.navLinks.classList.toggle('active');
-    });
-
-    // Chiudi il menu quando si clicca su un link
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', () => {
-            elements.navLinks.classList.remove('active');
+function initializeMenu() {
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            // Chiudi il menu quando si clicca su un link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                });
+            });
         });
-    });
-}
 
-// Event listeners per i pulsanti di chiusura dei modali
-document.querySelectorAll('.close').forEach(closeBtn => {
-    closeBtn.addEventListener('click', () => {
-        const modal = closeBtn.closest('.modal');
-        if (modal) {
-            toggleModal(modal, false);
-        }
-    });
-});
-
-// Funzioni per la gestione delle spese
-async function loadExpenses() {
-    try {
-        const expenses = await getExpenses();
-        if (!expenses) {
-            console.log('Nessuna spesa trovata');
-            updateExpenseStats([]);
-            updateExpensesList([]);
-            return [];
-        }
-        updateExpenseStats(expenses);
-        updateExpensesList(expenses);
-        return expenses;
-    } catch (error) {
-        console.error('Errore nel caricamento delle spese:', error);
-        updateExpenseStats([]);
-        updateExpensesList([]);
-        return [];
-    }
-}
-
-// Event listener per il form di aggiunta spesa
-if (elements.expenseForm) {
-    elements.expenseForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const type = document.getElementById('expenseType').value;
-        const amount = parseFloat(document.getElementById('expenseAmount').value);
-        const quantity = parseFloat(document.getElementById('expenseQuantity').value);
-        const date = document.getElementById('expenseDate').value;
-        
-        try {
-            // Aggiungi la spesa
-            await addExpense(type, amount, quantity, date);
-            
-            // Chiudi il modale e resetta il form
-            toggleModal(elements.expenseModal, false);
-            elements.expenseForm.reset();
-
-            // Ricarica le spese una sola volta
-            const expenses = await getExpenses();
-            updateExpensesList(expenses);
-            updateExpenseStats(expenses);
-            
-            // Se siamo nella pagina della dashboard, aggiorna i grafici
-            if (window.location.pathname.includes('dashboard.html')) {
-                updateCharts(expenses);
-                updateDrinksSummary(expenses);
+        // Chiudi il menu quando si clicca fuori
+        document.addEventListener('click', (e) => {
+            if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
+                navLinks.classList.remove('active');
             }
-            
-        } catch (error) {
-            console.error('Errore durante l\'aggiunta della spesa:', error);
-            alert(error.message);
-        }
-    });
-}
-
-// Event listener per il pulsante di aggiunta spesa
-if (elements.addExpenseBtn) {
-    elements.addExpenseBtn.addEventListener('click', () => {
-        toggleModal(elements.expenseModal, true);
-    });
-}
-
-// Funzione unificata per l'eliminazione delle spese
-async function handleDeleteExpense(expenseId) {
-    if (confirm('Sei sicuro di voler eliminare questa spesa?')) {
-        try {
-            await deleteExpense(expenseId);
-            const expenses = await getExpenses();
-            updateExpensesList(expenses);
-            updateExpenseStats(expenses);
-            
-            // Se siamo nella dashboard, aggiorna anche i grafici
-            if (window.location.pathname.includes('dashboard.html')) {
-                updateCharts(expenses);
-                updateDrinksSummary(expenses);
-            }
-        } catch (error) {
-            console.error('Errore nell\'eliminazione della spesa:', error);
-            alert('Errore nell\'eliminazione della spesa');
-        }
+        });
     }
 }
 
@@ -1362,6 +1278,7 @@ async function handleDeleteExpense(expenseId) {
 document.addEventListener('DOMContentLoaded', () => {
     // Inizializza gli elementi UI
     updateUI();
+    initializeMenu();
 
     // Carica i dati se l'utente è loggato
     if (currentUser) {

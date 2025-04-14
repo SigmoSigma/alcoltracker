@@ -597,6 +597,16 @@ tr:hover {
     font-size: 1.5rem;
     cursor: pointer;
     color: var(--primary-color);
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1001;
 }
 
 @media (max-width: 768px) {
@@ -615,31 +625,6 @@ tr:hover {
 
     .menu-toggle {
         display: block;
-        z-index: 1001;
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        color: #2c3e50;
-        cursor: pointer;
-        padding: 0.5rem;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-    }
-
-    .menu-toggle::before {
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        background: rgba(0, 0, 0, 0.1);
-        border-radius: 50%;
-        z-index: -1;
     }
 
     .nav-links {
@@ -658,7 +643,6 @@ tr:hover {
         max-height: calc(100vh - 60px);
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        touch-action: manipulation;
     }
 
     .nav-links.active {
@@ -680,12 +664,16 @@ tr:hover {
         display: flex;
         align-items: center;
         justify-content: center;
-        touch-action: manipulation;
     }
 
     .nav-link:hover, .nav-link:active {
         background: #e9ecef;
         transform: translateY(-2px);
+    }
+
+    .nav-link.active {
+        background: #3498db;
+        color: white;
     }
 
     .container {
@@ -793,7 +781,6 @@ tr:hover {
         max-height: calc(100vh - 50px);
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        touch-action: manipulation;
     }
 
     .nav-link {
