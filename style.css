@@ -489,6 +489,29 @@ tr:hover {
     position: relative;
 }
 
+.leaderboard-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.leaderboard-column {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.leaderboard-column h4 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    text-align: center;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #f1f3f5;
+}
+
 .leaderboard-list {
     display: none;
 }
@@ -544,6 +567,9 @@ tr:hover {
     color: #2c3e50;
     margin-bottom: 0.3rem;
     font-size: 1.1rem;
+    border-bottom: none;
+    padding-bottom: 0;
+    text-align: left;
 }
 
 .leaderboard-stats {
@@ -556,6 +582,13 @@ tr:hover {
 .leaderboard-value {
     font-weight: 600;
     color: #2c3e50;
+}
+
+@media (max-width: 768px) {
+    .leaderboard-columns {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
 }
 
 /* Menu hamburger per mobile */
@@ -574,6 +607,9 @@ tr:hover {
         top: 0;
         z-index: 1000;
         background: rgba(255, 255, 255, 0.98);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .nav-links {
@@ -589,6 +625,9 @@ tr:hover {
         align-items: center;
         gap: 1rem;
         z-index: 999;
+        max-height: calc(100vh - 60px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .nav-links.active {
@@ -600,11 +639,28 @@ tr:hover {
         text-align: center;
         padding: 0.8rem;
         font-size: 1.1rem;
+        display: block;
+        color: #2c3e50;
+        text-decoration: none;
+        background: #f8f9fa;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .nav-link:hover, .nav-link:active {
+        background: #e9ecef;
+        transform: translateY(-2px);
     }
 
     .menu-toggle {
         display: block;
         z-index: 1001;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #2c3e50;
+        cursor: pointer;
+        padding: 0.5rem;
     }
 
     .container {
@@ -697,6 +753,11 @@ tr:hover {
             opacity: 0.5;
             pointer-events: none;
         }
+
+        .navbar, .nav-links, .menu-toggle {
+            opacity: 1;
+            pointer-events: auto;
+        }
     }
 }
 
@@ -706,11 +767,16 @@ tr:hover {
         top: 50px;
         max-height: calc(100vh - 50px);
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .nav-link {
         padding: 0.6rem;
         font-size: 1rem;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .container {

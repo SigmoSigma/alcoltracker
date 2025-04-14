@@ -1172,8 +1172,8 @@ function updateGroupCharts(group, groupExpenses) {
         return [...memberStats].sort((a, b) => b[type].liters - a[type].liters);
     };
 
-    // Funzione per generare l'HTML della classifica
-    const generateLeaderboardHTML = (members, type) => {
+    // Funzione per generare l'HTML della classifica per spese
+    const generateExpenseLeaderboardHTML = (members, type) => {
         if (members.length === 0) {
             return '<div class="leaderboard-item">Nessun dato disponibile</div>';
         }
@@ -1185,6 +1185,24 @@ function updateGroupCharts(group, groupExpenses) {
                     <h4>${member.username}</h4>
                     <div class="leaderboard-stats">
                         <span>Spese: <span class="leaderboard-value">€${member[type].expense.toFixed(2)}</span></span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    };
+
+    // Funzione per generare l'HTML della classifica per litri
+    const generateLitersLeaderboardHTML = (members, type) => {
+        if (members.length === 0) {
+            return '<div class="leaderboard-item">Nessun dato disponibile</div>';
+        }
+        
+        return members.map((member, index) => `
+            <div class="leaderboard-item">
+                <div class="leaderboard-rank">${index + 1}</div>
+                <div class="leaderboard-info">
+                    <h4>${member.username}</h4>
+                    <div class="leaderboard-stats">
                         <span>Litri: <span class="leaderboard-value">${member[type].liters.toFixed(2)} L</span></span>
                     </div>
                 </div>
@@ -1195,28 +1213,38 @@ function updateGroupCharts(group, groupExpenses) {
     // Aggiorna le classifiche per ogni tipo di alcol
     const types = ['beer', 'wine', 'spirits', 'spritz'];
     types.forEach(type => {
-        const leaderboardEl = document.getElementById(`${type}Leaderboard`);
-        if (leaderboardEl) {
-            // Ordina per spese
+        // Aggiorna la classifica per spese
+        const expenseLeaderboardEl = document.getElementById(`${type}ExpenseLeaderboard`);
+        if (expenseLeaderboardEl) {
             const sortedByExpense = sortByExpense(type);
-            leaderboardEl.innerHTML = generateLeaderboardHTML(sortedByExpense, type);
+            expenseLeaderboardEl.innerHTML = generateExpenseLeaderboardHTML(sortedByExpense, type);
+        }
+
+        // Aggiorna la classifica per litri
+        const litersLeaderboardEl = document.getElementById(`${type}LitersLeaderboard`);
+        if (litersLeaderboardEl) {
+            const sortedByLiters = sortByLiters(type);
+            litersLeaderboardEl.innerHTML = generateLitersLeaderboardHTML(sortedByLiters, type);
         }
     });
 
     // Gestione dei tab
     const tabBtns = document.querySelectorAll('.tab-btn');
-    const leaderboardLists = document.querySelectorAll('.leaderboard-list');
+    const expenseLeaderboards = document.querySelectorAll('[id$="ExpenseLeaderboard"]');
+    const litersLeaderboards = document.querySelectorAll('[id$="LitersLeaderboard"]');
 
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             // Rimuovi la classe active da tutti i pulsanti e le liste
             tabBtns.forEach(b => b.classList.remove('active'));
-            leaderboardLists.forEach(l => l.classList.remove('active'));
+            expenseLeaderboards.forEach(l => l.classList.remove('active'));
+            litersLeaderboards.forEach(l => l.classList.remove('active'));
 
-            // Aggiungi la classe active al pulsante cliccato e alla lista corrispondente
+            // Aggiungi la classe active al pulsante cliccato e alle liste corrispondenti
             btn.classList.add('active');
             const tabId = btn.getAttribute('data-tab');
-            document.getElementById(`${tabId}Leaderboard`).classList.add('active');
+            document.getElementById(`${tabId}ExpenseLeaderboard`).classList.add('active');
+            document.getElementById(`${tabId}LitersLeaderboard`).classList.add('active');
         });
     });
 }
