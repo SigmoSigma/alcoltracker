@@ -672,7 +672,29 @@ tr:hover {
     .nav-link {
         margin: 1rem 0;
         font-size: 1.2rem;
-        pointer-events: auto;
+        color: white;
+        text-decoration: none;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        width: 100%;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-link:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .nav-link.active {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .nav-links .btn {
+        margin-top: 1rem;
+        width: 100%;
+        text-align: center;
     }
 
     .container {
